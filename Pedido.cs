@@ -1,28 +1,26 @@
 public class Pedido
 {
-    public Guid Id { get; private set; }
-    public Cliente Cliente { get; private set; }
-    public List<ItemPedido> Itens { get; private set; }
-    public DateTime DataPedido { get; private set; }
-    public decimal ValorTotal { get; private set; }
+    public Guid Id { get; private set; }                  // Identificador único do pedido
+    public Cliente Cliente { get; private set; }          // Cliente que fez o pedido
+    public List<ItemPedido> Itens { get; private set; }   // Lista de itens que o pedido contém
+    public DateTime DataPedido { get; private set; }      // Data e hora que o pedido foi criado
+    public decimal ValorTotal { get; private set; }       // Valor total do pedido, já com desconto aplicado
+    private IDescontoStrategy DescontoStrategy { get; set; } // Estratégia para calcular desconto (pode ser nula)
 
-    public Pedido(Cliente cliente, List<ItemPedido> itens)
+    // Construtor da classe Pedido, que recebe cliente, lista de itens e opcionalmente uma estratégia de desconto
+    public Pedido(Cliente cliente, List<ItemPedido> itens, IDescontoStrategy descontoStrategy = null)
     {
-        if (cliente == null)
-            throw new ArgumentException("Cliente é obrigatório.");
+        if (cliente == null)                                // Verifica se o cliente foi passado
+            throw new ArgumentException("Cliente é obrigatório.");  // Lança erro se não houver cliente
 
-        if (itens == null || !itens.Any())
-            throw new ArgumentException("O pedido deve conter ao menos um item.");
+        if (itens == null || !itens.Any())                 // Verifica se há itens no pedido
+            throw new ArgumentException("O pedido deve conter ao menos um item."); // Erro se lista vazia
 
-        Id = Guid.NewGuid();
-        Cliente = cliente;
-        Itens = itens;
-        DataPedido = DateTime.Now;
-        ValorTotal = CalcularValorTotal();
-    }
-
-    private decimal CalcularValorTotal()
-    {
-        return Itens.Sum(item => item.Subtotal); // Sum é um método que soma os valores retornados por uma função para cada item da lista.
+        Id = Guid.NewGuid();                                // Gera um ID único para o pedido
+        Cliente = cliente;                                  // Define o cliente do pedido
+        Itens = itens;                                      // Define a lista de itens do pedido
+        DataPedido = DateTime.Now;                          // Define a data atual como data do pedido
+        DescontoStrategy = descontoStrategy;                // Define a estratégia de desconto (pode ser nula)
+        ValorTotal = CalcularValorTotal();                  // Calcula o valor total do pedido, com desconto
     }
 }
